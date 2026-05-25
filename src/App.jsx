@@ -119,6 +119,8 @@ function App() {
       toast.error("Invalid Login");
 
     }
+    setEmail(""),
+    setPassword("");
 
   };
 

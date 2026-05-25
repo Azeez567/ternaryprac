@@ -22,7 +22,7 @@ export default function Register() {
     if (!email.trim()) return toast.error("Enter Email"), false;
 
     if (!/^[a-z0-9._%+-]+@[a-z.-]+\.[a-z]{2,}$/.test(email)) {
-      return toast.error("Enter valid email"), false;
+      return toast.error("Enter valid email Format"), false;
     }
     if (!/^[0-9]{10}$/.test(phone))
       return toast.error("Enter Valid Phone"), false;
