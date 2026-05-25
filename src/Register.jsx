@@ -172,7 +172,7 @@ export default function Register() {
             style={styles.submitBtn}
             disabled={loading}
           >
-            {loading ? "Submitting..." : "Submit"}
+            {loading ? "Submitting..." : "Register"}
           </button>
 
           <button
