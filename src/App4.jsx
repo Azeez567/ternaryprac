@@ -82,6 +82,7 @@ export default function App4() {
                 </span>
 
                 <button
+                disabled={page === 20}
                     onClick={() => dispatch(increment())}
                 >
                     Next
