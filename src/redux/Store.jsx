@@ -4,7 +4,8 @@ import {
 } from "@reduxjs/toolkit";
 
 import authReducer from "./authSlice";
-import mathReducer from "./mathSlice"
+import mathReducer from "./mathSlice";
+import pageReducer from "./pageSlice";
 
 import {
   persistStore,
@@ -40,7 +41,7 @@ const rootReducer = combineReducers({
 
   auth: authReducer,
   math: mathReducer,
-
+  page: pageReducer,
 });
 
 /* Persist Config */
@@ -50,7 +51,7 @@ const persistConfig = {
 
   storage,
 
-  whitelist: ["auth"],
+  whitelist: ["auth","page"],
   blacklist: ["math"]
 };
 

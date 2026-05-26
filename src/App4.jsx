@@ -1,92 +1,96 @@
-import { useState } from "react";
+
+import { useDispatch, useSelector } from "react-redux";
 
 import { useQuery } from "@tanstack/react-query";
+import { increment, decrement, Reset } from "./redux/pageSlice";
 
 export default function App4() {
+    const dispatch = useDispatch();
+    const page = useSelector((state) => state.page.value)
 
-  const [page, setPage] = useState(1);
 
-  // Fetch Function
-  const fetchPosts = async (page) => {
 
-    const res = await fetch(
-      `https://jsonplaceholder.typicode.com/posts?_limit=5&_page=${page}`
-    );
+    // Fetch Function
+    const fetchPosts = async (page) => {
 
-    return res.json();
-  };
+        const res = await fetch(
+            `https://jsonplaceholder.typicode.com/posts?_limit=5&_page=${page}`
+        );
 
-  // Query
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-    isFetching,
-  } = useQuery({
-    queryKey: ["posts", page],
+        return res.json();
+    };
 
-    queryFn: () => fetchPosts(page),
+    // Query
+    const {
+        data,
+        isLoading,
+        isError,
+        error,
+        isFetching,
+    } = useQuery({
+        queryKey: ["posts", page],
 
-    // Keeps old data while loading new page
-    placeholderData: (previousData) => previousData,
-  });
+        queryFn: () => fetchPosts(page),
 
-  // Loading
-  if (isLoading) {
-    return <h1>Loading...</h1>;
-  }
+        // Keeps old data while loading new page
+        placeholderData: (previousData) => previousData,
+    });
 
-  // Error
-  if (isError) {
-    return <h1>{error.message}</h1>;
-  }
+    // Loading
+    if (isLoading) {
+        return <h1>Loading...</h1>;
+    }
 
-  return (
-    <div style={{ padding: "20px" }}>
+    // Error
+    if (isError) {
+        return <h1>{error.message}</h1>;
+    }
 
-      <h1>TanStack Pagination</h1>
+    return (
+        <div style={{ padding: "20px" }}>
 
-      {/* Posts */}
-      {data.map((post) => (
-        <div
-          key={post.id}
-          style={{
-            border: "1px solid black",
-            marginBottom: "10px",
-            padding: "10px",
-          }}
-        >
-            <h3>Id : {post.id}</h3>
-          <h3>Title : {post.title}</h3>
-          <h3>Body : {post.body}</h3>
+            <h1>TanStack Pagination</h1>
+
+            {/* Posts */}
+            {data.map((post) => (
+                <div
+                    key={post.id}
+                    style={{
+                        border: "1px solid black",
+                        marginBottom: "10px",
+                        padding: "10px",
+                    }}
+                >
+                    <h3>Id : {post.id}</h3>
+                    <h3>Title : {post.title}</h3>
+                    <h3>Body : {post.body}</h3>
+                </div>
+            ))}
+
+            {/* Buttons */}
+            <div style={{ marginTop: "20px" }}>
+
+                <button
+                    disabled={page === 1}
+                    onClick={() => dispatch(decrement())}
+                >
+                    Prev
+                </button>
+
+                <span style={{ margin: "0 10px" }}>
+                    Page {page}
+                </span>
+
+                <button
+                    onClick={() => dispatch(increment())}
+                >
+                    Next
+                </button>
+                <button onClick={() => dispatch(Reset(1))} style={{ margin: "0px 10px" }} >Reset</button>
+            </div>
+
+            {/* Background Fetch */}
+            {isFetching && <p>Fetching New Data...</p>}
         </div>
-      ))}
-
-      {/* Buttons */}
-      <div style={{ marginTop: "20px" }}>
-
-        <button
-          disabled={page === 1}
-          onClick={() => setPage((prev) => prev - 1)}
-        >
-          Prev
-        </button>
-
-        <span style={{ margin: "0 10px" }}>
-          Page {page}
-        </span>
-
-        <button
-          onClick={() => setPage((prev) => prev + 1)}
-        >
-          Next
-        </button>
-        <button onClick={()=>setPage(1)} style={{margin: "0px 10px"}} >Reset</button>
-      </div>
-
-      {/* Background Fetch */}
-      {isFetching && <p>Fetching New Data...</p>}
-    </div>
-  );
+    );
 }
