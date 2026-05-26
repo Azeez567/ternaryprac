@@ -1,97 +1,206 @@
-
 import { useDispatch, useSelector } from "react-redux";
 
 import { useQuery } from "@tanstack/react-query";
-import { increment, decrement, Reset } from "./redux/pageSlice";
+
+import {
+  increment,
+  decrement,
+  Reset,
+} from "./redux/pageSlice";
+
+import { fetchPosts } from "./hooks/pageApi";
 
 export default function App4() {
-    const dispatch = useDispatch();
-    const page = useSelector((state) => state.page.value)
 
+  const dispatch = useDispatch();
 
+  const page = useSelector(
+    (state) => state.page.value
+  );
 
-    // Fetch Function
-    const fetchPosts = async (page) => {
+  // Query
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    isFetching,
+  } = useQuery({
+    queryKey: ["posts", page],
 
-        const res = await fetch(
-            `https://jsonplaceholder.typicode.com/posts?_limit=5&_page=${page}`
-        );
+    queryFn: () => fetchPosts(page),
 
-        return res.json();
-    };
+    // Keeps old data while loading new page
+    placeholderData: (previousData) => previousData,
+  });
 
-    // Query
-    const {
-        data,
-        isLoading,
-        isError,
-        error,
-        isFetching,
-    } = useQuery({
-        queryKey: ["posts", page],
-
-        queryFn: () => fetchPosts(page),
-
-        // Keeps old data while loading new page
-        placeholderData: (previousData) => previousData,
-    });
-
-    // Loading
-    if (isLoading) {
-        return <h1>Loading...</h1>;
-    }
-
-    // Error
-    if (isError) {
-        return <h1>{error.message}</h1>;
-    }
-
+  // Loading
+  if (isLoading) {
     return (
-        <div style={{ padding: "20px" }}>
-
-            <h1>TanStack Pagination</h1>
-
-            {/* Posts */}
-            {data.map((post) => (
-                <div
-                    key={post.id}
-                    style={{
-                        border: "1px solid black",
-                        marginBottom: "10px",
-                        padding: "10px",
-                    }}
-                >
-                    <h3>Id : {post.id}</h3>
-                    <h3>Title : {post.title}</h3>
-                    <h3>Body : {post.body}</h3>
-                </div>
-            ))}
-
-            {/* Buttons */}
-            <div style={{ marginTop: "20px" }}>
-
-                <button
-                    disabled={page === 1}
-                    onClick={() => dispatch(decrement())}
-                >
-                    Prev
-                </button>
-
-                <span style={{ margin: "0 10px" }}>
-                    Page {page}
-                </span>
-
-                <button
-                disabled={page === 20}
-                    onClick={() => dispatch(increment())}
-                >
-                    Next
-                </button>
-                <button onClick={() => dispatch(Reset(1))} style={{ margin: "0px 10px" }} >Reset</button>
-            </div>
-
-            {/* Background Fetch */}
-            {isFetching && <p>Fetching New Data...</p>}
-        </div>
+      <h1
+        style={{
+          textAlign: "center",
+          marginTop: "50px",
+        }}
+      >
+        Loading...
+      </h1>
     );
+  }
+
+  // Error
+  if (isError) {
+    return (
+      <h1
+        style={{
+          textAlign: "center",
+          color: "red",
+          marginTop: "50px",
+        }}
+      >
+        {error.message}
+      </h1>
+    );
+  }
+
+  return (
+    <div
+      style={{
+        maxWidth: "900px",
+        margin: "40px auto",
+        padding: "20px",
+        fontFamily: "Arial",
+      }}
+    >
+
+      {/* Heading */}
+      <h1
+        style={{
+          textAlign: "center",
+          marginBottom: "30px",
+          color: "#333",
+        }}
+      >
+        TanStack Pagination
+      </h1>
+
+      {/* Posts */}
+      {data?.map((post) => (
+        <div
+          key={post.id}
+          style={{
+            backgroundColor: "#ffffff",
+            borderRadius: "10px",
+            padding: "20px",
+            marginBottom: "20px",
+            boxShadow: "0px 2px 10px rgba(0,0,0,0.1)",
+          }}
+        >
+
+          <p>
+            <b>ID :</b> {post.id}
+          </p>
+
+          <p>
+            <b>Title :</b> {post.title}
+          </p>
+
+          <p>
+            <b>Body :</b> {post.body}
+          </p>
+        </div>
+      ))}
+
+      {/* Pagination Buttons */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: "15px",
+          marginTop: "30px",
+          flexWrap: "wrap",
+        }}
+      >
+
+        {/* Prev */}
+        <button
+          disabled={page === 1}
+          onClick={() => dispatch(decrement())}
+          style={{
+            padding: "10px 20px",
+            border: "none",
+            borderRadius: "8px",
+            backgroundColor:
+              page === 1 ? "#cccccc" : "#007bff",
+            color: "#ffffff",
+            cursor:
+              page === 1 ? "not-allowed" : "pointer",
+            fontWeight: "bold",
+          }}
+        >
+          Prev
+        </button>
+
+        {/* Page Number */}
+        <span
+          style={{
+            fontSize: "18px",
+            fontWeight: "bold",
+          }}
+        >
+          Page {page}
+        </span>
+
+        {/* Next */}
+        <button
+          disabled={page === 10}
+          onClick={() => dispatch(increment())}
+          style={{
+            padding: "10px 20px",
+            border: "none",
+            borderRadius: "8px",
+            backgroundColor:
+              page === 10 ? "#cccccc" : "#28a745",
+            color: "#ffffff",
+            cursor:
+              page === 10 ? "not-allowed" : "pointer",
+            fontWeight: "bold",
+          }}
+        >
+          Next
+        </button>
+
+        {/* Reset */}
+        <button
+          onClick={() => dispatch(Reset(1))}
+          style={{
+            padding: "10px 20px",
+            border: "none",
+            borderRadius: "8px",
+            backgroundColor: "#dc3545",
+            color: "#ffffff",
+            cursor: "pointer",
+            fontWeight: "bold",
+          }}
+        >
+          Reset
+        </button>
+      </div>
+
+      {/* Fetching */}
+      {isFetching && (
+        <p
+          style={{
+            textAlign: "center",
+            marginTop: "20px",
+            color: "#555",
+            fontWeight: "bold",
+          }}
+        >
+          Fetching New Data...
+        </p>
+      )}
+    </div>
+  );
 }
